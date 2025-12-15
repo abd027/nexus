@@ -20,10 +20,9 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Plus, ChevronRight, RefreshCw, Wrench, AlertCircle, ServerOff } from "lucide-react"
+import { Plus, ChevronRight, RefreshCw, Wrench } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export function DashboardPage() {
   const navigate = useNavigate()
@@ -35,24 +34,17 @@ export function DashboardPage() {
 
   const {
     data: tickets,
-    isLoading: isLoadingTickets,
-    error: ticketsError,
+    isLoading,
     refetch,
   } = useQuery({
     queryKey: ["tickets"],
     queryFn: api.tickets.getAll,
     refetchInterval: 5000, // Poll every 5s
-    retry: false,
   })
 
-  const { 
-    data: masters, 
-    isLoading: isLoadingMasters,
-    error: mastersError 
-  } = useQuery({
+  const { data: masters } = useQuery({
     queryKey: ["masters"],
     queryFn: api.masters.getAll,
-    retry: false,
   })
 
   const createToolMutation = useMutation({
@@ -137,57 +129,15 @@ export function DashboardPage() {
         </div>
       </div>
 
-      {(ticketsError || mastersError) ? (
-        <Card className="border-destructive">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-destructive">
-              <ServerOff className="w-5 h-5" />
-              Backend Connection Error
-            </CardTitle>
-            <CardDescription>
-              Unable to connect to the API server. Please check your backend configuration.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="rounded-lg bg-destructive/10 p-4 space-y-2">
-              <p className="text-sm font-medium">Error Details:</p>
-              <p className="text-sm text-muted-foreground">
-                {ticketsError?.message || mastersError?.message || "Failed to fetch data from backend"}
-              </p>
-            </div>
-            <div className="rounded-lg bg-muted p-4 space-y-2">
-              <p className="text-sm font-medium">Troubleshooting:</p>
-              <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-                <li>Ensure the backend server is running on port 5000</li>
-                <li>Check that the API_URL environment variable is set correctly</li>
-                <li>For Vercel deployment, ensure VITE_API_URL points to your deployed backend</li>
-                <li>Verify CORS settings allow requests from your frontend domain</li>
-              </ul>
-            </div>
-            <Button onClick={() => { refetch(); queryClient.invalidateQueries({ queryKey: ["masters"] }) }} variant="outline">
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Retry Connection
-            </Button>
-          </CardContent>
-        </Card>
-      ) : isLoadingTickets || isLoadingMasters ? (
+      {isLoading ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <SkeletonTicketCard key={i} />
           ))}
         </div>
-      ) : !masters || masters.length === 0 ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>No Masters Found</CardTitle>
-            <CardDescription>
-              No masters have been configured yet. Please set up your backend data.
-            </CardDescription>
-          </CardHeader>
-        </Card>
       ) : (
         <div className="space-y-6">
-          {masters.map((master) => (
+          {masters?.map((master) => (
             <div key={master.id} className="space-y-3">
               <div className="flex items-center justify-between">
                 <button
@@ -223,36 +173,17 @@ export function DashboardPage() {
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                     className="overflow-hidden"
                   >
-                    {groupedTickets?.[master.name]?.length === 0 ? (
-                      <div className="pl-7 pt-6">
-                        <Card className="border-dashed">
-                          <CardContent className="flex flex-col items-center justify-center py-8">
-                            <AlertCircle className="w-12 h-12 text-muted-foreground mb-4" />
-                            <p className="text-muted-foreground">No tickets for this master yet</p>
-                            <Button 
-                              variant="outline" 
-                              className="mt-4" 
-                              onClick={() => navigate("/create")}
-                            >
-                              <Plus className="w-4 h-4 mr-2" />
-                              Create First Ticket
-                            </Button>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    ) : (
-                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 pl-7 pt-6">
-                        <AnimatePresence mode="popLayout">
-                          {groupedTickets?.[master.name]?.map((ticket) => (
-                            <TicketCard
-                              key={ticket.id}
-                              ticket={ticket}
-                              onClick={() => navigate(`/ticket/${ticket.id}`)}
-                            />
-                          ))}
-                        </AnimatePresence>
-                      </div>
-                    )}
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 pl-7 pt-6">
+                      <AnimatePresence mode="popLayout">
+                        {groupedTickets?.[master.name]?.map((ticket) => (
+                          <TicketCard
+                            key={ticket.id}
+                            ticket={ticket}
+                            onClick={() => navigate(`/ticket/${ticket.id}`)}
+                          />
+                        ))}
+                      </AnimatePresence>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>

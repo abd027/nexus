@@ -6,31 +6,20 @@ const API_URL = typeof import.meta !== "undefined" && (import.meta as any).env?.
   : "http://localhost:5000/api"
 
 async function fetchAPI<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  try {
-    const response = await fetch(`${API_URL}${endpoint}`, {
-      ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...options?.headers,
-      },
-    })
+  const response = await fetch(`${API_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+  })
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: response.statusText }))
-      throw new Error(error.error || `HTTP error! status: ${response.status}`)
-    }
-
-    return response.json()
-  } catch (error) {
-    // Handle network errors (CORS, connection refused, etc.)
-    if (error instanceof TypeError && error.message.includes("fetch")) {
-      throw new Error(
-        `Cannot connect to backend API at ${API_URL}. Please ensure the backend server is running and accessible.`
-      )
-    }
-    // Re-throw other errors
-    throw error
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: response.statusText }))
+    throw new Error(error.error || `HTTP error! status: ${response.status}`)
   }
+
+  return response.json()
 }
 
 export const api = {
