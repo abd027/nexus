@@ -1,9 +1,7 @@
 import type { Ticket, Master, Tool, AuditLog, TicketState } from "@/types/ticket"
 
-// API URL - defaults to localhost:5000
-const API_URL = typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_API_URL 
-  ? (import.meta as any).env.VITE_API_URL 
-  : "http://localhost:5000/api"
+// API URL - use environment variable in production, localhost in dev
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api"
 
 async function fetchAPI<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${API_URL}${endpoint}`, {
