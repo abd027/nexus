@@ -2,9 +2,8 @@
 
 import type React from "react"
 
-import { useState, useEffect, useLayoutEffect } from "react"
+import { useState, useEffect, useLayoutEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
-import { motion } from "framer-motion"
 import gsap from "gsap"
 import { toast } from "sonner"
 import { useAuthStore } from "@/store/auth"
@@ -22,6 +21,7 @@ export function LoginPage() {
   const [password, setPassword] = useState("admin")
   const [isLoading, setIsLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const cardRef = useRef<HTMLDivElement>(null)
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const hasHydrated = useAuthStore((state) => state.hasHydrated)
 
@@ -37,20 +37,20 @@ export function LoginPage() {
   }, [])
 
   useEffect(() => {
-    if (!mounted) return
+    if (!mounted || !cardRef.current || !hasHydrated) return
 
-    // Run animation when showing the form
+    // Run animation when showing the form - use ref for reliable targeting
     const ctx = gsap.context(() => {
-      gsap.from(".login-card", {
+      gsap.from(cardRef.current, {
         scale: 0.8,
         opacity: 0,
         duration: 0.6,
         ease: "back.out(1.7)",
       })
-    })
+    }, cardRef)
 
     return () => ctx.revert()
-  }, [mounted])
+  }, [mounted, hasHydrated])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -84,7 +84,7 @@ export function LoginPage() {
   // Show login form while redirecting
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600/20 via-background to-blue-600/20 p-4">
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="login-card w-full max-w-md">
+      <div ref={cardRef} className="login-card w-full max-w-md">
         <Card className="shadow-2xl glassmorphism">
           <CardHeader className="space-y-4 text-center">
             <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center shadow-lg">
@@ -135,7 +135,7 @@ export function LoginPage() {
             </div>
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
     </div>
   )
 }
