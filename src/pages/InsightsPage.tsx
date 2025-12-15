@@ -15,10 +15,10 @@ export function InsightsPage() {
 
   const stats = {
     byState: {
-      ready: tickets?.filter((t) => t.state === "ready").length || 0,
-      working: tickets?.filter((t) => t.state === "working").length || 0,
-      review: tickets?.filter((t) => t.state === "review").length || 0,
-      done: tickets?.filter((t) => t.state === "done").length || 0,
+      ready: tickets?.filter((t) => t.state === "Ready").length || 0,
+      monitoring: tickets?.filter((t) => t.state === "Monitoring").length || 0,
+      critical: tickets?.filter((t) => t.state === "Critical").length || 0,
+      complete: tickets?.filter((t) => t.state === "Complete").length || 0,
     },
     byMaster: tickets?.reduce(
       (acc, ticket) => {
@@ -68,7 +68,7 @@ export function InsightsPage() {
                 </div>
               </div>
               <p className="text-sm text-muted-foreground mb-1">Completed</p>
-              <p className="text-3xl font-bold">{stats.byState.done}</p>
+              <p className="text-3xl font-bold">{stats.byState.complete}</p>
             </Card>
 
             <Card className="p-6">

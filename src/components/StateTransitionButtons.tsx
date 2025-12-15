@@ -12,7 +12,6 @@ interface StateTransitionButtonsProps {
   currentState: TicketState
   onTransition: (newState: TicketState) => void
   isLoading: boolean
-  masterId?: string
   ticketId?: string
   allTickets?: Array<{ id: string; master: string; state: TicketState; ticketNumber?: string }>
   jobRequest?: string
@@ -45,7 +44,6 @@ export function StateTransitionButtons({
   currentState,
   onTransition,
   isLoading,
-  masterId,
   ticketId,
   allTickets = [],
   jobRequest = "",

@@ -17,7 +17,7 @@ import { Boxes, Loader2 } from "lucide-react"
 
 export function LoginPage() {
   const navigate = useNavigate()
-  const { login, logout } = useAuthStore()
+  const { login } = useAuthStore()
   const [email, setEmail] = useState("admin@nexus.com")
   const [password, setPassword] = useState("admin")
   const [isLoading, setIsLoading] = useState(false)

@@ -230,7 +230,6 @@ export function TicketDetailPage() {
                 currentState={ticket.state}
                 onTransition={(newState) => updateStateMutation.mutate(newState)}
                 isLoading={updateStateMutation.isPending}
-                masterId={ticket.master}
                 ticketId={ticket.id}
                 allTickets={allTickets}
                 jobRequest={ticket.jobRequest}
